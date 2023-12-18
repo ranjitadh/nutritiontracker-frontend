@@ -6,7 +6,6 @@
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -28,7 +27,20 @@
   .loader {
     @apply mx-auto border-4 border-transparent rounded-full border-b-sky-500 border-t-sky-700 w-6 h-6 animate-spin
   }
+  .profileBox{
+    @apply border rounded-3xl bg-[#E0E0E0] w-fit h-fit shadow-3xl overflow-hidden
+  }
+
+  .profileDivInput {
+    @apply text-center capitalize w-[50%] bg-transparent outline-none text-black border-transparent placeholder:text-end
+  }
+
+  .profileDivText {
+    @apply text-black w-[50%]
+  }
 }
+
+;
 
 
 @tailwind base;
@@ -40,3 +52,5 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+;

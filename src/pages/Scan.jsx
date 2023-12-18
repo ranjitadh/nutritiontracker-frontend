@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { useNavigate, redirect } from "react-router-dom";
-import Webcam from 'react-webcam';
+import { sendPhoto } from "../request/api";
 
 const Scan = () => {
   const videoRef = useRef(null);
@@ -31,15 +31,17 @@ const Scan = () => {
   };
 
   const takePhoto = () => {
-    const width = 640;
-    const height = 480;
-
+    const width = 400;
+    const height = 500;
+    let canvas = document.createElement('canvas');
     let video = videoRef.current;
     let photo = photoRef.current;
 
     let context = photo.getContext('2d');
     context.drawImage(video, 0, 0, width, height);
 
+    let imageDataUrl = canvas.toDataUrl('image/jpeg');
+    sendPhoto(imageDataUrl);
   };
 
   const navToHome = () => {
@@ -57,13 +59,10 @@ const Scan = () => {
   return (
     <div>
       <div>
-        <video className="w-[100%] h-screen" ref={videoRef} ></video>
-
-        <button className="border rounded-full border-red-700 bg-red-700 p-4 m-4" onClick={navToHome}>close</button>
-        <button className="border rounded-full border-green-700 bg-green-700 p-4 my-4" onClick={takePhoto}>snap</button>
-
-        {/* <video className="w-[100%] h-screen" ref={videoRef} ></video>
-        <canvas className="w-full fixed bottom-0" ref={photoRef}></canvas> */}
+        <video className="w-full h-full" ref={videoRef} ></video>
+        <button className="float-left border rounded-full border-red-700 bg-red-700 p-4 m-4" onClick={navToHome}>close</button>
+        <button className="float-right border rounded-full border-green-700 bg-green-700 p-4 m-4" onClick={takePhoto}>snap</button>
+        <canvas className=" w-full" ref={photoRef}></canvas>
       </div>
     </div>
   )

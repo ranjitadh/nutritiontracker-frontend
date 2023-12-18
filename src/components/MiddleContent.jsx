@@ -5,36 +5,50 @@ import { useQuery } from "@tanstack/react-query";
 import Loader from "./LoadingUi";
 
 const MiddleContent = () => {
-  const [foodInput, setFoodInput] = useState("");
-  const [foodName, setFoodName] = useState("");
+  const [foodInput, setFoodInput] = useState();
+  const [foodName, setFoodName] = useState();
   const [hide, setHide] = useState(true);
+  const [searchData, setSearchData] = useState(null);
+
 
   const { data, error, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["SearchFood", foodName],
     queryFn: () => getNutrients(foodName),
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    cacheTime: Infinity,
+    enabled: !hide,
   });
 
   const recommandation = useQuery({
     queryKey: ["getFood"],
     queryFn: getCuisine,
+    staleTime: Infinity,
+    cacheTime: Infinity,
   });
 
-  useEffect(() => {
-    recommandation.refetch();
-  }, []);
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setHide(false);
     setFoodName(foodInput);
-    refetch().then(setHide(false));
+    setSearchData(data);
+    refetch();
   };
 
-  const DataCard = ({ dataArray }) => {
-    console.log(dataArray);
-    const dataObject = Object.entries(dataArray[0]);
+  const DataCard = ({ searchData }) => {
+    const dataObject = Object.entries(searchData[0] || []);
 
     if (isLoading) {
       return <Loader />;
+    };
+
+    if (isFetching) {
+      return <Loader />
     }
+
+    if (dataObject == undefined) {
+      return (<p>Data is unavialable</p>)
+    };
 
     return (
       <div className={hide && "hidden"}>
@@ -42,42 +56,46 @@ const MiddleContent = () => {
           Close
         </button>
         <table className="border w-[100%] table-auto border-spacing-0.5 border-collapse odd:bg-red-400 ">
-          <tr className="bg-green-600">
-            <th>Nutrients</th>
-            <th>Amount</th>
-          </tr>
-          {dataObject.map((i, index) => {
-            let [key, value] = i;
-            return (
-              <tr className="border text-ellipsis text-center">
-                <td className="border capitalize">{key}</td>
-                <td>{value}</td>
-              </tr>
-            );
-          })}
+          <tbody>
+            <tr className="bg-green-600">
+              <th>Nutrients</th>
+              <th>Amount</th>
+            </tr>
+            {dataObject.map((i, index) => {
+              let [key, value] = i;
+              return (
+                <tr key={index} className="border text-ellipsis text-center">
+                  <td className="border capitalize">{key}</td>
+                  <td>{value}</td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
       </div>
     );
   };
 
   return (
-    <div className="w-[100%] h-[82%] sticky">
-      <div className="border rounded-full p-4 flex ">
+    <div className="pt-1 w-[100%] h-[80%] overflow-y-auto">
+
+      <div className="w-full flex items-center outline-1 outline rounded-full ">
         <input
-          className="bg-transparent outline-none w-[92%] text-black"
+          className="w-[90%] outline-none bg-transparent text-base border-transparent p-2 text- text-black"
           value={foodInput}
-          placeholder="Apple"
+          placeholder="Foods Names"
           onChange={(e) => setFoodInput(e.target.value)}
         />
         <MagnifyingGlassIcon
-          className="w-6 h-full cursor-pointer "
-          onClick={handleSubmit}
+          className="w-6 h-full cursor-pointer"
+          onClick={() => { handleSubmit() }}
         />
       </div>
-      {/* display the content received from searched input */}
-      <div name="container for searched data" className={hide && "hidden"}>
+
+      {/* display the contet received from searched input */}
+      <div name="container for searched data" className={hide ? "hidden" : ""}>
         <div className="h-full w-full text-black">
-          {isFetching ? <Loader /> : <DataCard dataArray={data} />}
+          {isFetching ? <Loader /> : (searchData ? <DataCard searchData={searchData} /> : <p>Not find</p>)}
         </div>
       </div>
 
@@ -85,9 +103,9 @@ const MiddleContent = () => {
       <div className="my-4 border rounded-md bg-orange-400">
         <h2 className="text-red-700 font-bold">Today's Special</h2>
         <div className="w-full flex flex-col h-full space-y-2">
-          {recommandation.data?.meals.map((i) => {
+          {recommandation.data?.meals.map((i, index) => {
             return (
-              <div className="border rounded-lg space-x-4 w-full h-[80px] flex items-center bg-white">
+              <div className="border rounded-lg space-x-4 w-full h-[80px] flex items-center bg-white" key={index}>
                 <img
                   src={i.strMealThumb}
                   alt={i.strMeal}
