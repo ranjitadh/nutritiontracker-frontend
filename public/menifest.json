@@ -1,0 +1,9 @@
+{
+    "theme_color" : "#d5d1ce",
+    "background_color" : "#eee6de",
+    "display" : "standalone",
+    "scope" : "/",
+    "start_url" : "/",
+    "name" : "Nutrition Tracker",
+    "short_name" : "NT",
+    }
